@@ -49,6 +49,9 @@ locals {
   
   subnets = "${split(",", var.created_database_subnets ? join(",",data.terraform_remote_state.vpc.database_subnets) : join(",",data.terraform_remote_state.vpc.private_subnets))}"
 
+  common_name = "${var.namespace == "" ? "" : "${var.namespace}-"}${lower(var.project_env_short)}-rds-${lower(var.identifier)}"
+  dns_name    = "${coalesce(var.customized_dns_name, local.common_name)}"
+
 }
 
 # RDS and resources:
@@ -156,4 +159,14 @@ module "db_instance" {
   deletion_protection = "${var.deletion_protection}"
 
   tags = "${local.tags}"
+}
+
+## DNS local:
+resource "aws_route53_record" "endpoint" {
+  count   = "${var.dns_private ? 1 : 0}"
+  zone_id = "${data.terraform_remote_state.vpc.private_zone_id}"
+  name    = "${local.dns_name}.${var.domain_local}"
+  type    = "CNAME"
+  ttl     = "60"
+  records = ["${module.db_instance.this_db_instance_address}"]
 }

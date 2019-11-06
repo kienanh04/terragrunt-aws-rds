@@ -1,6 +1,7 @@
 variable "project_name" { default = "Demo" }
 variable "project_env" { default = "Production" }
 variable "project_env_short" { default = "prd" }
+variable "namespace" { default = "" }
 
 variable "aws_region" { default = "us-west-2" }
 variable "aws_profile" { default = "default" }
@@ -20,6 +21,10 @@ variable "enable_env_tags" {
    description = "Allow add Env Tags into Tags when searching"
    default     = true
 }
+
+variable "domain_local" { default = "private.local" }
+variable "dns_private" { default = true }
+variable "customized_dns_name" { default = "" }
 
 ## Reference from: https://github.com/terraform-aws-modules/terraform-aws-rds/blob/v1.32.0/variables.tf
 variable "identifier" {
